@@ -53,26 +53,16 @@ var createNewTaskElement=function(taskString){
   return listItem;
 }
 
-
-
 var addTask=function(){
-  console.log("Add Task...");
   //Create a new list item with the text from the #new-task:
   var listItem=createNewTaskElement(taskInput.value);
-
+  ajaxRequest('/',taskInput.value, listItem);
   //Append listItem to incompleteTaskHolder
-  incompleteTaskHolder.appendChild(listItem);
-  bindTaskEvents(listItem, taskCompleted);
-
-  taskInput.value="";
-
 }
 
 //Edit an existing task.
 
 var editTask=function(){
-  console.log("Edit Task...");
-  console.log("Change 'edit' to 'save'");
 
 
   var listItem=this.parentNode;
@@ -99,7 +89,6 @@ var editTask=function(){
 
 //Delete task.
 var deleteTask=function(){
-  console.log("Delete Task...");
 
   var listItem=this.parentNode;
   var ul=listItem.parentNode;
@@ -111,7 +100,6 @@ var deleteTask=function(){
 
 //Mark task completed
 var taskCompleted=function(){
-  console.log("Complete Task...");
 
   //Append the task list item to the #completed-tasks
   var listItem=this.parentNode;
@@ -122,7 +110,6 @@ var taskCompleted=function(){
 
 
 var taskIncomplete=function(){
-  console.log("Incomplete Task...");
 //Mark task as incomplete.
   //When the checkbox is unchecked
   //Append the task list item to the #incomplete-tasks.
@@ -132,22 +119,41 @@ var taskIncomplete=function(){
 }
 
 
+var ajaxRequest= async function(urll ,val, item){
+  try {
+    const url = urll;
+    const data = {title: val };
 
-var ajaxRequest=function(){
-  console.log("AJAX Request");
+    const response = await fetch(url, {
+      method: 'POST', // или 'PUT'
+      body: JSON.stringify(data), // данные могут быть 'строкой' или {объектом}!
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    if(response.status === 201){
+      const json = await response.json();
+      console.log(item);
+      console.log(json);
+      incompleteTaskHolder.appendChild(item);
+      bindTaskEvents(item, taskCompleted);
+      taskInput.value="";
+    }
+
+  }catch (e) {
+    console.error(e)
+  }
 }
 
 //The glue to hold it all together.
 
-
 //Set the click handler to the addTask function.
-addButton.onclick=addTask;
+/*addButton.onclick=addTask;*/
 addButton.addEventListener("click",addTask);
-addButton.addEventListener("click",ajaxRequest);
+//addButton.addEventListener("click",ajaxRequest);
 
 
 var bindTaskEvents=function(taskListItem,checkBoxEventHandler){
-  console.log("bind list item events");
 //select ListItems children
   var checkBox=taskListItem.querySelector("input[type=checkbox]");
   var editButton=taskListItem.querySelector("button.edit");
