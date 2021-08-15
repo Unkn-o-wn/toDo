@@ -18,13 +18,23 @@ const sequelize = require('../utils/DB.js');
         }
     })
 
+todo.getToDo = async function (cb) {
+   try {
+       const allToDo = await this.findAll();
+       await cb(allToDo);
+      /* await this.findAll().then(data=>{cb(data)}).catch(e=>console.error(e));*/
+
+
+
+   }catch (e) {
+       console.error(e)
+   }
+}
 
 todo.createNewToDo = async function (data,  cb) {
      data.done = false;
-    console.log(data);
      await this.create(data)
          .then((data)=>{
-
         cb(data);
      }).catch(err=>{
          cb(err);
@@ -32,6 +42,30 @@ todo.createNewToDo = async function (data,  cb) {
 
 
 
+}
+
+todo.editSomeToDo = async function (idE, title,  cb) {
+        try {
+            const edit = await this.findByPk(idE);
+            edit.title = title;
+            await edit.save();
+            cb(edit);
+        }catch (e) {
+            console.error()
+        }
+}
+
+todo.deleteSomeToDo = async function (idR, cb){
+      try {
+          const deleteItem = await this.destroy({
+              where: {
+                  id: idR
+              }
+          })
+          cb(deleteItem);
+      }  catch (e) {
+          console.error(e)
+      }
 }
 
 module.exports = todo

@@ -3,7 +3,7 @@ const router = express.Router();
 const controllerIndex = require('../controller/index');
 
 
-router.get('/', controllerIndex.getPage);
+router.get('/', controllerIndex.getToDo);
 
 router.post('/', controllerIndex.addNewToDo);
 
