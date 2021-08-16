@@ -55,6 +55,17 @@ todo.editSomeToDo = async function (idE, title,  cb) {
         }
 }
 
+todo.completeToDo = async function (idE, cb) {
+    try {
+        const complete = await this.findByPk(idE);
+        complete.done = true;
+        await complete.save();
+        cb(complete);
+    }catch (e) {
+        console.error()
+    }
+}
+
 todo.deleteSomeToDo = async function (idR, cb){
       try {
           const deleteItem = await this.destroy({

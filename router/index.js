@@ -9,6 +9,7 @@ router.post('/', controllerIndex.addNewToDo);
 
 router.put('/:id', controllerIndex.editSomeToDo);
 
+router.put('/complete/:id', controllerIndex.completeToDo);
 
 router.delete('/:id', controllerIndex.deleteSomeToDo);
 

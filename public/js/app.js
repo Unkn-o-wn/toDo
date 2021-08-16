@@ -153,8 +153,9 @@ let taskCompleted=function(){
 
   //Append the task list item to the #completed-tasks
   let listItem=this.parentNode;
-  completedTasksHolder.appendChild(listItem);
-  bindTaskEvents(listItem, taskIncomplete);
+  let id = listItem.querySelector('label').dataset.id;
+  ajaxRequestCompleted(id, listItem);
+
 
 }
 
@@ -212,11 +213,21 @@ let ajaxRequestGet = async function(){
       method: 'GET', // или 'PUT'
     });
     const json =  await response.json();
+    console.log(json)
     if(response.status === 200){
       json.forEach(item=>{
+
        let backI =  createGetTaskElement(item);
-        incompleteTaskHolder.appendChild(backI);
-        bindTaskEvents(backI, taskCompleted);
+        if(item.done){
+          completedTasksHolder.appendChild(backI);
+          backI.querySelector('input[type="checkbox"]').remove();
+          backI.querySelector('button.edit').remove();
+          backI.querySelector('sub').innerHTML = `Завершенно ${dateFormat(item.updatedAt)}`;
+          bindTaskEvents(backI, taskIncomplete);
+        }else{
+          incompleteTaskHolder.appendChild(backI);
+          bindTaskEvents(backI, taskCompleted);
+        }
       })
 
     }
@@ -250,6 +261,26 @@ let ajaxRequestEdit = async function(id, data, li){
   }
 }
 
+let ajaxRequestCompleted = async function(id, li){
+  try {
+    const url = `/api/complete/${id}`;
+    const response = await fetch(url, {
+      method: 'put', // или 'PUT'
+    });
+    const json = await response.json();
+    if (response.status === 200){
+      completedTasksHolder.appendChild(li);
+
+      li.querySelector('input[type="checkbox"]').remove();
+      li.querySelector('button.edit').remove();
+      bindTaskEvents(li);
+        li.querySelector('sub').innerHTML = `Завершенно ${dateFormat(json)}`;
+
+    }
+  }catch (e) {
+    console.error(e)
+  }
+}
 
 let ajaxRequestDelete = async function(item, li, ul){
   try {
@@ -272,17 +303,21 @@ addButton.addEventListener("click",addTask);
 
 let bindTaskEvents=function(taskListItem,checkBoxEventHandler){
 //select ListItems children
+
+  let deleteButton=taskListItem.querySelector("button.delete");
+if(taskListItem.querySelector('button.edit') && taskListItem.querySelector("input[type=checkbox]")){
   let checkBox=taskListItem.querySelector("input[type=checkbox]");
   let editButton=taskListItem.querySelector("button.edit");
-  let deleteButton=taskListItem.querySelector("button.delete");
-
+  editButton.onclick=editTask;
+  checkBox.onchange=checkBoxEventHandler;
+}
 
   //Bind editTask to edit button.
-  editButton.onclick=editTask;
+
   //Bind deleteTask to delete button.
   deleteButton.onclick=deleteTask;
   //Bind taskCompleted to checkBoxEventHandler.
-  checkBox.onchange=checkBoxEventHandler;
+
 }
 
 //cycle over incompleteTaskHolder ul list items

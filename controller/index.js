@@ -17,11 +17,15 @@ module.exports.addNewToDo = function (req,res) {
         })
 }
 
-
 module.exports.editSomeToDo = function (req,res) {
     modelToDo.editSomeToDo(req.params.id, req.body.title, (edit)=>{
-        console.log(edit);
         res.status(200).json(edit.updatedAt).end();
+    })
+}
+
+module.exports.completeToDo = function (req,res) {
+    modelToDo.completeToDo(req.params.id, (complete)=>{
+        res.status(200).json(complete.updatedAt).end();
     })
 }
 
